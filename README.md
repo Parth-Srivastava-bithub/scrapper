@@ -3,7 +3,8 @@
 Automated scraping and data synchronization worker for GPU cloud providers (**RunPod**, **Novita AI**, and **Vast.ai**). The worker runs on a scheduled cadence to ingest GPU catalogs, pricing, stock levels, and datacenter availability into MongoDB.
 
 > **Guides & Documentation**:
-> - Detailed Setup & Operating Guide: [startup.md](startup.md)
+> - Native Local Setup (No Docker): [localsetup.md](localsetup.md)
+> - Containerized & Production Startup Guide: [startup.md](startup.md)
 > - Architectural Deep-Dive & Browser Automation: [HOW_IT_WORKS.md](HOW_IT_WORKS.md)
 
 ---
