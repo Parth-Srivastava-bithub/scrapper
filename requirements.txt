@@ -1,0 +1,10 @@
+playwright
+apscheduler
+requests
+python-dotenv
+pymongo
+certifi
+rapidfuzz
+rich
+pytest
+pydantic
