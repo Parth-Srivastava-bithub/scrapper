@@ -22,16 +22,27 @@ class NovitaMaintainer:
         upsert_many(gpus)
 
     def sync_datacenters(self):
-        """Fetch Novita regions/datacenters and upsert into MongoDB."""
+        """Fetch Novita regions/datacenters and upsert into MongoDB with real availability."""
         print("\n========== Novita Datacenters Maintainer ==========")
         regions = self.api.get_regions()
+        cluster_avail_map = {
+            item["cluster"]: set(item["available"])
+            for item in self.api.get_datacenter_gpu_availability(gpu_num=1)
+        }
 
         for region in regions:
+            region_name = region.get("name", "")
+            avail_gpus = cluster_avail_map.get(region_name, set())
+
             gpu_availability = [
-                {"gpu_name": gpu, "available": True} for gpu in region.get("gpus", [])
+                {
+                    "gpu_name": gpu,
+                    "available": gpu in avail_gpus,
+                }
+                for gpu in region.get("gpus", [])
             ]
 
-            match = re.match(r"(.+?)\s+\((.+)\)", region.get("name", ""))
+            match = re.match(r"(.+?)\s+\((.+)\)", region_name)
             location = match.group(2) if match else ""
 
             self.datacenters_collection.update_one(
@@ -40,7 +51,7 @@ class NovitaMaintainer:
                     "$set": {
                         "provider": "Novita",
                         "datacenter_id": region["id"],
-                        "name": region.get("name"),
+                        "name": region_name,
                         "location": location,
                         "gpuAvailability": gpu_availability,
                         "network_volume": region.get("feature", {}).get(

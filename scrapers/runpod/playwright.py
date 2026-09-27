@@ -8,7 +8,11 @@ _current_dir = str(Path(__file__).resolve().parent)
 if sys.path and sys.path[0] == _current_dir:
     sys.path.pop(0)
 
-from playwright.sync_api import sync_playwright
+try:
+    from playwright.sync_api import sync_playwright
+except ImportError:
+    sync_playwright = None
+
 from rapidfuzz import fuzz
 from rich import print
 
@@ -16,6 +20,8 @@ chrome_url = os.getenv("CHROME_CDP_URL", "http://127.0.0.1:9222")
 
 
 def runpod_scrape_runpod(cdp_url: str | None = None):
+    if sync_playwright is None:
+        raise ImportError("Playwright is not installed.")
     url = cdp_url or os.getenv("CHROME_CDP_URL", chrome_url)
     with sync_playwright() as p:
         browser = p.chromium.connect_over_cdp(url)

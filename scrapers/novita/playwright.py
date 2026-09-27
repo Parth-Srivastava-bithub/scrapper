@@ -8,8 +8,10 @@ _current_dir = str(Path(__file__).resolve().parent)
 if sys.path and sys.path[0] == _current_dir:
     sys.path.pop(0)
 
-# pyrefly: ignore [missing-import]
-from playwright.sync_api import sync_playwright
+try:
+    from playwright.sync_api import sync_playwright
+except ImportError:
+    sync_playwright = None
 
 chrome_url = os.getenv("CHROME_CDP_URL", "http://127.0.0.1:9222")
 
@@ -47,8 +49,21 @@ def parse_gpu_availability(text: str):
 
 
 def scrape_novita_datacenters(cdp_url: str | None = None):
+    # Prefer reliable API endpoint over fragile browser automation
+    try:
+        from .api import NovitaScraperAPI
+        api = NovitaScraperAPI()
+        avail = api.get_datacenter_gpu_availability()
+        if avail:
+            return avail
+    except Exception:
+        pass
+
     url = cdp_url or os.getenv("CHROME_CDP_URL", chrome_url)
     results = []
+
+    if sync_playwright is None:
+        raise ImportError("Playwright is not installed.")
 
     with sync_playwright() as p:
         browser = p.chromium.connect_over_cdp(url)

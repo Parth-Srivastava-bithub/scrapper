@@ -35,8 +35,9 @@ query {
 def runpod_get_gpus():
     url = "https://api.runpod.io/graphql"
 
+    api_key = (os.getenv("RUNPOD_API_KEY") or "").strip('"').strip("'")
     headers = {
-        "Authorization": f"Bearer {os.getenv('RUNPOD_API_KEY')}",
+        "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
     try:

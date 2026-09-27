@@ -1,5 +1,5 @@
 from .api import RunpodScraperAPI
-from .cli import sync_runpod_datacenters_cli
+from .cli import sync_runpod_datacenters_cli, sync_runpod_gpus_cli
 from .graphql import runpod_get_gpus
 from .playwright import (
     match_gpu,
@@ -10,10 +10,11 @@ from .playwright import (
 
 __all__ = [
     "runpod_get_gpus",
+    "sync_runpod_gpus_cli",
+    "sync_runpod_datacenters_cli",
     "runpod_scrape_runpod",
     "runpod_merge",
     "normalize_gpu_name",
     "match_gpu",
-    "sync_runpod_datacenters_cli",
     "RunpodScraperAPI",
 ]

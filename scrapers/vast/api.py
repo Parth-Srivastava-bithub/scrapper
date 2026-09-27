@@ -10,7 +10,7 @@ class VastScraperAPI:
     """Vast.ai Scraper API client for querying and normalizing GPU offers."""
 
     def __init__(self, api_key: Optional[str] = None, base_url: Optional[str] = None):
-        self.api_key = api_key or os.getenv("VASTAI_API_KEY", "")
+        self.api_key = (api_key or os.getenv("VASTAI_API_KEY", "")).strip('"').strip("'")
         self.base_url = (base_url or "https://console.vast.ai/api/v0").rstrip("/")
         self.bundles_url = f"{self.base_url}/bundles/"
 

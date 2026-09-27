@@ -11,8 +11,8 @@ from pymongo.server_api import ServerApi
 
 load_dotenv()
 
-MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017/")
-MONGODB_DB_NAME = os.getenv("MONGODB_DB_NAME", "gpu_aggregator")
+MONGODB_URI = os.getenv("MONGODB_URI", "mongodb://localhost:27017/").strip('"').strip("'")
+MONGODB_DB_NAME = os.getenv("MONGODB_DB_NAME", "gpu_aggregator").strip('"').strip("'")
 
 _client: MongoClient | None = None
 

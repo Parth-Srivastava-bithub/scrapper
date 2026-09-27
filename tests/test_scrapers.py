@@ -102,6 +102,47 @@ def test_parse_gpu_availability():
     assert "H100" in parsed["unavailable"]
 
 
+def test_novita_scraper_api_gpu_availability_mocked():
+    api = NovitaScraperAPI(api_key="mock_key")
+    mock_products = [
+        {
+            "id": "H100-80GB.22c150g",
+            "name": "H100 SXM 80GB",
+            "cpuPerGpu": 22,
+            "memoryPerGpu": 150,
+            "price": "339000",
+            "availableDeploy": True,
+            "inventoryState": "low",
+            "regions": ["US-CA-06", "AS-IN-01"],
+        },
+        {
+            "id": "4090.16c62g",
+            "name": "RTX 4090 24GB",
+            "cpuPerGpu": 16,
+            "memoryPerGpu": 62,
+            "price": "33000",
+            "availableDeploy": False,
+            "inventoryState": "none",
+            "regions": ["US-CA-06"],
+        },
+    ]
+    api.get_products_raw = lambda gpu_num=1: mock_products
+
+    # 1. Product availability table
+    table = api.get_gpu_availability(gpu_num=1)
+    assert len(table) == 2
+    assert table[0]["available"] == "Yes"
+    assert table[0]["deployable"] is True
+    assert table[1]["available"] == "No"
+    assert table[1]["deployable"] is False
+
+    # 2. Datacenter GPU availability
+    dc_avail = api.get_datacenter_gpu_availability(gpu_num=1)
+    us_ca = next(d for d in dc_avail if d["cluster"] == "US-CA-06")
+    assert "H100 SXM 80GB" in us_ca["available"]
+    assert "RTX 4090 24GB" in us_ca["unavailable"]
+
+
 def test_playwright_cdp_skipped_when_unavailable():
     """Verify live Playwright CDP connection is skipped if Chrome is not running."""
     from scrapers.runpod.playwright import runpod_scrape_runpod
